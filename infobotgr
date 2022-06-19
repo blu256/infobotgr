@@ -1,0 +1,61 @@
+#!/bin/env python3
+# --------------------------------
+# InfoBot.GR                   0.9
+# --------------------------------
+# By @blu256@koyu.space
+# Released into the Public Domain
+# --------------------------------
+from sys import argv
+
+from ierror import error
+import istatusfile
+import imodules
+import ipost
+
+
+# -- Κάποιες ρυθμίσεις ----------------------- #
+
+OPTIONS = {
+    # Λειτουργία αποσφαλμάτωσης
+    # (Όχι τουτ, απλή έξοδος στο stdout)
+    "debug":    False
+}
+
+
+# -- Διαθέσιμες λειτουργίες ------------------ #
+
+# Η σύνταξη είναι: "όνομα_λειτουργίας": [λίστα από modules]
+MODES = {
+    "sunrise":  ["sunrise"],
+#   "kalimera": ["kalimera", "weather"],
+#   "feeds":    ["gi"]
+}
+
+
+# ----- Από δω και κάτω δεν χρειάζεται ------ #
+# ----------- να αλλάξετε κάτι -------------- #
+
+def usage_modes():
+    modestr = ""
+    for m in MODES:
+        modestr += "\n\t* {}".format(m)
+    error("Δεν ορίσατε λειτουργία.\nΔιαθέσιμες λειτουργίες: {}".format(modestr), 1)
+
+
+if __name__ != "__main__":
+    error("Δεν μπορείτε να χρησιμοποιήσετε αυτό το σενάριο ως βιβλιοθήκη!", 1)
+
+if len(argv) != 2:
+    usage_modes()
+
+mode = argv[1]
+if mode not in MODES:
+    usage_modes()
+
+istatusfile.load()
+ipost.set_debug(OPTIONS['debug'])
+ipost.set_statusfile(istatusfile)
+ipost.post_all(imodules.load(MODES[mode], istatusfile))
+
+
+istatusfile.write()
